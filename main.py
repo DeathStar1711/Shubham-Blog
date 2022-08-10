@@ -14,7 +14,7 @@ import os
 from flask import send_from_directory
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 login_manager = LoginManager()
@@ -27,8 +27,8 @@ gravatar = Gravatar(app,
                     force_lower=False,
                     use_ssl=False,
                     base_url=None)
-email = "Sender_Email"
-password_mail = "Sender_Email_Password"
+email = os.environ.get("Sender_Email")
+password_mail = os.environ.get("Sender_Email_Password")
 
 
 @app.route('/favicon.ico')
@@ -43,7 +43,7 @@ def load_user(user_id):
 
 
 ##CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",  "sqlite:///blog.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -198,7 +198,7 @@ def contact():
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
             connection.login(user=email, password=password_mail)
-            connection.sendmail(from_addr=email, to_addrs="Receiver_Email",
+            connection.sendmail(from_addr=email, to_addrs=os.environ.get("Receiver_Email"),
                                 msg=f"Subject:Registration Confirmation\n\n{request.form['name']}\n{request.form['email']}\n{request.form['number']}\n{request.form['message']}\n\nGenerated Through Python")
             flash(message="Message sent Successfully!")
             return redirect(url_for("contact"))
